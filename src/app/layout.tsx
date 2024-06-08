@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "./_components/header";
-import RedisProvider from "./providers/redis-provider";
+import MongoDBProvider from "./providers/mongodb-providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,12 +19,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <RedisProvider>
+        <MongoDBProvider>
           <main className="max-w-4xl p-4  h-screen flex flex-col">
             <Header />
             <div className="flex-1">{children}</div>
           </main>
-        </RedisProvider>
+        </MongoDBProvider>
       </body>
     </html>
   );
