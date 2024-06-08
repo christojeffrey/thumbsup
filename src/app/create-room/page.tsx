@@ -1,3 +1,8 @@
+"use client";
+import { useState } from "react";
+
 export default function CreateRoom() {
-  return <>page</>;
+  const [roomName, setRoomName] = useState("");
+  const [peopleCount, setPeopleCount] = useState("");
+  return <></>;
 }
