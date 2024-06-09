@@ -1,3 +1,3 @@
 import { atom } from "jotai";
 
-export const mongoDBAtom = atom<any>(null);
+export const firebaseDBAtom = atom<any>(null);

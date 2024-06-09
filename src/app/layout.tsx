@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "./_components/header";
 import FirebaseProvider from "./providers/firebase-provider";
-
+import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -24,6 +24,7 @@ export default function RootLayout({
             <Header />
             <div className="flex-1">{children}</div>
           </main>
+          <Toaster />
         </FirebaseProvider>
       </body>
     </html>

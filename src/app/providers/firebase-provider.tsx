@@ -1,20 +1,12 @@
 "use client";
 
-import { mongoDBAtom } from "@/store";
-import { useAtom } from "jotai";
-import { MongoClient } from "mongodb";
 import { useEffect, useState } from "react";
-
-// import { MongoClient } from 'mongodb'
-
-// Connection URL
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, set } from "firebase/database";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { useSetAtom } from "jotai";
+import { firebaseDBAtom } from "@/store";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -29,20 +21,21 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-console.log("process.env.FIREBASE_API_KEY", process.env.FIREBASE_PROJECT_ID);
 export default function FirebaseProvider({ children }: { children: React.ReactNode }) {
   const [isSetup, setIsSetup] = useState(false);
+  const setFirebaseDB = useSetAtom(firebaseDBAtom);
 
   useEffect(() => {
-    console.log("firebaseConfig", firebaseConfig);
     const app = initializeApp(firebaseConfig);
     // add data to realtime database
     const db = getDatabase(app);
     // const db = getDatabase();
-    set(ref(db, "rooms/55"), {
-      username: "asdfasd",
-    });
+    // set(ref(db, "rooms/55"), {
+    //   username: "asdfasasfdd",
+    // });
+    setFirebaseDB(db);
     setIsSetup(true);
+
   }, []);
 
   return <>{isSetup && children}</>;
