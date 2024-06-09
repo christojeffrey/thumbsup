@@ -135,7 +135,6 @@ export default function Room({ params }: { params: { roomID: string } }) {
     for (let i = 0; i < parseInt(currentRoom.peopleCount); i++) {
       tempResult = tempResult - i;
     }
-    tempResult = tempResult / 10;
     setResult(tempResult);
     setStep(4);
   }
@@ -147,7 +146,7 @@ export default function Room({ params }: { params: { roomID: string } }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        secret: voteValue ? 10 + voterID : voterID,
+        secret: voteValue ? 1 + voterID : voterID,
         quantity: parseInt(currentRoom.peopleCount),
       }),
     });
@@ -168,8 +167,9 @@ export default function Room({ params }: { params: { roomID: string } }) {
     set(ref(firebaseDB, `rooms/${params.roomID}/voters/${voterID}/secret`), editedSecret);
   }
   // trigger based on voting state
+
   useEffect(() => {
-    if (votingState == "calculating") {
+    if (votingState == "calculating" && secrets.length == 0) {
       turnToShares();
     }
   }, [votingState]);

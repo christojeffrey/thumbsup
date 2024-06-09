@@ -3,13 +3,14 @@ import { Button } from "@/components/ui/button";
 import { firebaseDBAtom } from "@/store";
 import { onValue, ref, set } from "firebase/database";
 import { useAtomValue } from "jotai";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Room({ params }: { params: { roomID: string } }) {
   const [currentRoom, setCurrentRoom] = useState<any>();
 
   const firebaseDB = useAtomValue(firebaseDBAtom);
-
+  const router = useRouter();
   // subscribe to current room
   useEffect(() => {
     const roomsRef = ref(firebaseDB, "rooms/" + params.roomID);
@@ -58,6 +59,7 @@ export default function Room({ params }: { params: { roomID: string } }) {
         <Button
           onClick={() => {
             set(ref(firebaseDB, "rooms/" + params.roomID), null);
+            router.push("/");
           }}
         >
           Delete Room
