@@ -26,45 +26,67 @@ export default function Room({ params }: { params: { roomID: string } }) {
   function changeVotingState(votingState: string) {
     set(ref(firebaseDB, "rooms/" + params.roomID + "/votingState"), votingState);
   }
+
+  // waiting view
   if (currentRoom?.votingState === "waiting") {
+    const currentVoters = currentRoom.voters?.length || 0;
     return (
-      <>
-        <div>Waiting for the people to join</div>
-        {currentRoom.voters?.length} people joined
-        {currentRoom.voters?.length == currentRoom.peopleCount && (
-          <>
+      <div className="flex flex-col justify-center items-center">
+        <div className="text-3xl mt-24">{currentRoom.voteTitle}</div>
+        <div className="font-bold mt-24">
+          <span className="text-5xl">{currentVoters}</span>
+          <span>/{currentRoom?.peopleCount}</span>
+        </div>
+        {currentRoom.voters?.length == currentRoom.peopleCount ? (
+          <div className="mt-24">
             <Button onClick={() => changeVotingState("voting")}>Start Voting</Button>
-          </>
+          </div>
+        ) : (
+          <div className="mt-24">wait for people to join</div>
         )}
-      </>
+      </div>
     );
   }
+
+  // voting view
   if (currentRoom?.votingState === "voting") {
     const currentVoters = currentRoom.voters?.reduce((acc: number, voter: any) => {
       return acc + (voter.voted ? 1 : 0);
     }, 0);
     return (
       <>
-        <div>Voting</div>
-        {/* end when everyone has vote */}
-        {currentVoters}
-        people voted
-        {currentVoters == currentRoom?.peopleCount && <Button onClick={() => changeVotingState("calculating")}>calculate result</Button>}
+        <div className="flex flex-col justify-center items-center">
+          <div className="text-3xl mt-24">{currentRoom.voteTitle}</div>
+          <div className="font-bold mt-24">
+            <span className="text-5xl">{currentVoters}</span>
+            <span>/{currentRoom?.peopleCount}</span>
+          </div>
+          {currentVoters == currentRoom.peopleCount ? (
+            <div className="mt-24">
+              <Button onClick={() => changeVotingState("calculating")}>Calculate!</Button>
+            </div>
+          ) : (
+            <div className="mt-24">wait for people to vote</div>
+          )}
+        </div>
       </>
     );
   }
+
+  // calculating view
   if (currentRoom?.votingState === "calculating") {
     return (
-      <>
+      <div className="mt-12 mx-auto w-fit">
         <Button
           onClick={() => {
             set(ref(firebaseDB, "rooms/" + params.roomID), null);
             router.push("/");
           }}
+          variant="destructive"
         >
           Delete Room
         </Button>
-      </>
+      </div>
     );
   }
   return <></>;

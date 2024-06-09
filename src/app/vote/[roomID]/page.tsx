@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { firebaseDBAtom } from "@/store";
 import { onValue, ref, set } from "firebase/database";
 import { useAtomValue } from "jotai";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { parse } from "path";
 import { useEffect, useState } from "react";
 
@@ -21,7 +21,7 @@ export default function Room({ params }: { params: { roomID: string } }) {
   // 2 - sum
   // 3 - combine
   // 4 - done! show result
-
+  const router = useRouter();
   const firebaseDB = useAtomValue(firebaseDBAtom);
 
   // subscribe to current room
@@ -70,6 +70,11 @@ export default function Room({ params }: { params: { roomID: string } }) {
     }
   }, [currentRoom]);
   useEffect(() => {
+    // update query params
+    const query = new URLSearchParams();
+    query.set("voterID", voterID.toString());
+    query.set("step", step.toString());
+    router.push(`/vote/${params.roomID}?${query.toString()}`);
     if (step == 1) {
       console.log("calculating sum");
       // get the secret of my own index from everyone
@@ -103,6 +108,10 @@ export default function Room({ params }: { params: { roomID: string } }) {
   }, [step]);
 
   useEffect(() => {
+    const urlStep = searchParams.get("step") ? parseInt(searchParams.get("step")!) : 0;
+    console.log("urlStep", urlStep);
+    setStep(urlStep);
+
     // get room data
     const roomRef = ref(firebaseDB, `rooms/${params.roomID}`);
 
@@ -127,8 +136,6 @@ export default function Room({ params }: { params: { roomID: string } }) {
       }),
     });
     const data = await response.json();
-    console.log(data);
-    console.log(data.result);
 
     // minus all voterID, and divide by 10. will give you the number of 'yes'
     let tempResult = data.result;
@@ -176,35 +183,42 @@ export default function Room({ params }: { params: { roomID: string } }) {
 
   // do vote!
   if (votingState === "waiting") {
-    return <div>waiting...</div>;
+    return <div className="text-2xl font-semibold text-slate-500 text-center mt-12">Wait for others to join</div>;
   }
 
   if (votingState === "voting") {
     const hasVoted = currentRoom.voters[voterID]?.voted;
 
     if (hasVoted) {
-      return <div>you have voted</div>;
+      return <div className="text-2xl font-semibold text-slate-500 text-center mt-12">You have voted! Wait for the other.</div>;
     }
     return (
       <div>
-        <div>Start</div>
         <div className="text-6xl">{currentRoom.voteTitle}</div>
-        <Button
-          onClick={() => {
-            setVoteValue(true);
-            set(ref(firebaseDB, `rooms/${params.roomID}/voters/${voterID}/voted`), true);
-          }}
-        >
-          yes!
-        </Button>
-        <Button
-          onClick={() => {
-            setVoteValue(false);
-            set(ref(firebaseDB, `rooms/${params.roomID}/voters/${voterID}/voted`), true);
-          }}
-        >
-          no!
-        </Button>
+        <div className="mt-12 flex gap-8">
+          <Button
+            onClick={() => {
+              setVoteValue(false);
+              set(ref(firebaseDB, `rooms/${params.roomID}/voters/${voterID}/voted`), true);
+            }}
+            size="lg"
+            className="flex-1"
+            variant="destructive"
+          >
+            No!
+          </Button>
+          <Button
+            onClick={() => {
+              setVoteValue(true);
+              set(ref(firebaseDB, `rooms/${params.roomID}/voters/${voterID}/voted`), true);
+            }}
+            size="lg"
+            className="flex-1"
+            variant="outline"
+          >
+            Yes!
+          </Button>
+        </div>
       </div>
     );
   }
@@ -214,13 +228,20 @@ export default function Room({ params }: { params: { roomID: string } }) {
 
     if (result !== null) {
       return (
-        <>
+        <div className="text-center">
           <div>Result</div>
-          <div className="text-6xl">{`${result} out of ${currentRoom.peopleCount} said yes`}</div>
-        </>
+          <div className="text-3xl mt-24">{currentRoom.voteTitle}</div>
+
+          <div className="font-bold mt-24 text-5xl">
+            <span>{result}</span>
+            <span>/{currentRoom?.peopleCount}</span>
+          </div>
+          <div className="text-xl">{`${result} out of ${currentRoom.peopleCount} said yes`}</div>
+          <div className="mt-36">you can now close this tab</div>
+        </div>
       );
     }
-    return <>calculating</>;
+    return <>calculating...</>;
   }
 
   return <></>;

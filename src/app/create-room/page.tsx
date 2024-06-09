@@ -55,7 +55,7 @@ export default function CreateRoom() {
       </div>
       <div className="mt-12">
         <Label>Number of People</Label>
-        <Input placeholder="3" className="w-24" type="number" onChange={(e) => setPeopleCount(e.target.value)}></Input>
+        <Input placeholder="3" min="2" max="10" className="w-24" type="number" onChange={(e) => setPeopleCount(e.target.value)}></Input>
         <div className="text-sm text-slate-500">
           <div>It has to be exact!</div>
           <div>You can{`'`}t change this in the middle of the voting</div>
