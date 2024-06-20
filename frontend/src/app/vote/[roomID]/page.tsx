@@ -76,7 +76,6 @@ export default function Room({ params }: { params: { roomID: string } }) {
     query.set("step", step.toString());
     router.push(`/vote/${params.roomID}?${query.toString()}`);
     if (step == 1) {
-      console.log("calculating sum");
       // get the secret of my own index from everyone
       const secretsFromEveryone = currentRoom?.voters.map((voter: any) => {
         return voter.secret[voterID];
@@ -91,18 +90,14 @@ export default function Room({ params }: { params: { roomID: string } }) {
         return acc + secret.value;
       }, 0);
 
-      console.log(sum);
       sum = sum % secretsFromEveryone[voterID].modulus;
-      console.log(sum);
 
       set(ref(firebaseDB, `rooms/${params.roomID}/voters/${voterID}/sum`), sum);
     } else if (step == 2) {
-      console.log("sum is ready");
       // get the sum of my own index from everyone
       const sumsFromEveryone = currentRoom?.voters.map((voter: any) => {
         return voter.sum;
       });
-      console.log(sumsFromEveryone);
       combineShares(sumsFromEveryone);
     }
   }, [step]);

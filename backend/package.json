@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "shamirs-secret-sharing": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2"
+  }
+}
